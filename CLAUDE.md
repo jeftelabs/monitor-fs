@@ -1,34 +1,37 @@
-# Instruções para Claude e agentes de IA
+# Orientações para Claude e agentes de IA
 
-As regras completas e canônicas do repositório estão em [`AGENTS.md`](./AGENTS.md). Leia esse arquivo e a documentação pertinente em [`docs/README.md`](./docs/README.md) antes de trabalhar. Este repositório contém `@jeftelabs/exception`, uma biblioteca ESM em TypeScript para erros personalizados.
+As instruções canônicas estão em [`AGENTS.md`](./AGENTS.md). Leia também as páginas relevantes de [`docs/README.md`](./docs/README.md). Este repositório contém `@jeftelabs/monitor-fs`, uma integração de Chokidar com o parser oficial de `tsconfig` do TypeScript.
 
-## Fluxo de entendimento
+## Fluxo de investigação
 
-1. Confira `AGENTS.md` e os guias/referências em `docs/`.
-2. Confirme o comportamento em [`src/exception.ts`](./src/exception.ts), a API pública em [`index.ts`](./index.ts) e os casos existentes em `tests/`.
-3. Consulte `package.json`, `tsconfig.json` e `.github/workflows/` para validar os entry points, os scripts, o build e as rotinas de publicação.
-4. Use [`README.md`](./README.md) para orientação de usuários. `README copy.md` é apenas uma referência editorial: não copie descrições ou exemplos sem conferi-los contra este pacote.
+1. Leia `AGENTS.md` e a documentação da área.
+2. Confira o parser, o manager e o watcher em `src/`, junto aos testes relacionados.
+3. Verifique exports em `index.ts` e `package.json`, configuração TypeScript, dependências/peer dependencies e workflows.
+4. Use README.md como introdução pública e valide exemplos/comportamento no código e nos testes locais.
 
 ## Documentação obrigatória para toda alteração
 
-É **extremamente obrigatório criar ou atualizar documentação detalhada toda vez que algo novo for criado ou qualquer parte do projeto for modificada**. Isso inclui código, APIs, testes, exemplos, configuração, dependências, scripts, CI/CD e os próprios documentos. Complete a documentação na mesma tarefa da alteração.
+É **extremamente obrigatório criar ou atualizar documentação detalhada sempre que algo novo for criado ou qualquer parte do projeto for modificada**. Isso inclui código, API, tipos, testes, configuração, dependências, scripts, automações, exemplos e os documentos em si. Faça a atualização na mesma tarefa.
 
-- Registre em `docs/` o propósito, o funcionamento, o uso, os efeitos, as limitações e a manutenção da área afetada.
-- Atualize `docs/README.md` para que toda página nova seja fácil de encontrar, usando a organização em guias, referências, planning e outras seções relevantes.
-- Atualize o README raiz quando houver impacto em instalação, API pública, uso, exemplos, requisitos ou contribuição.
-- Use assinaturas e exemplos confirmados na implementação e nos testes; não atribua ao pacote comportamentos de outro projeto ou do arquivo de referência.
-- Não conclua a tarefa deixando documentação necessária para depois.
+- Explique para humanos e IAs por que existe, como funciona, quais opções/efeitos/eventos produz, limites e como manter/verificar.
+- Mantenha páginas em `docs/` com `guides`, `references`, `planning` e seções pertinentes.
+- Inclua todas as páginas novas no índice `docs/README.md` e mantenha descoberta a partir do README raiz.
+- Atualize o README quando instalação, API, compatibilidade ou exemplos mudarem.
+- Confira claims sobre TypeScript parser, globs, extensões e eventos na implementação. Diferencie erro fatal de `ParsedCommandLine.errors`.
+- Documente qualquer alteração em configuração necessária ao runner ou build.
+- Não finalize sem documentação correspondente.
 
-## Resumo da API e do projeto
+## Mapa do pacote
 
-- `Exception` é a classe base e aceita mensagem e `ErrorOptions` estendidas com `code` e `status`.
-- `InvalidArgumentsException` e `RuntimeException` são subclasses pré-configuradas.
-- `createError` cria uma classe de exceção com mensagem e código estáticos; os argumentos para interpolação são passados como array.
-- O entry point único é `index.ts`; a distribuição ESM e as declarações são geradas em `build/`.
-- O runner de teste começa em `bin/test.ts`; os casos estão em `tests/exception.spec.ts`.
+- [`index.ts`](./index.ts): exports `ConfigParser`, `SourceFilesManager`, `Watcher`.
+- `src/config_parser.ts`: invoca `typescript.getParsedCommandLineOfConfigFile`.
+- `src/source_files_manager.ts`: normaliza paths e aplica glob patterns com picomatch.
+- `src/watcher.ts`: filtra caminhos no Chokidar, classifica eventos e atualiza source manager.
+- `src/types.ts`: opções e mapa de eventos tipados.
+- `tests/`: testes de config parser e source manager; exemplos de uso ficam no README.
 
 ## Comandos e práticas
 
-Verifique `package.json` para os scripts atuais. `npm test` inclui lint e cobertura; `npm run quick:test` executa testes sem cobertura; `npm run lint`, `npm run typecheck` e `npm run build` fazem as verificações descritas nos scripts. `npm run format` altera os arquivos.
+Confirme scripts em `package.json`: `npm run quick:test`, `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` e `npm run format` (escreve). Preserve ESM, subpath `/types`, peer dependency TypeScript, normalização de paths e payloads de eventos.
 
-Preserve as exportações, a compatibilidade TypeScript/ESM e a semântica de erro coberta pelos testes. Mantenha imports relativos TypeScript compatíveis com `@jeftelabs/exec` via `rewriteRelativeImportExtensions`. Use Conventional Commits. Faça commit, push e PR apenas quando houver solicitação explícita. Nunca descarte alterações existentes ou exponha segredos.
+Use Conventional Commits. Faça commit/push/PR apenas quando solicitado. Não descarte alterações existentes ou exponha segredos.
